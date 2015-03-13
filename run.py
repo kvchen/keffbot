@@ -43,15 +43,24 @@ def load_plugins(active_plugins):
             mod = importlib.import_module(os.path.basename(plugin)[:-3])
             mod_name = mod.__name__
 
+            if mod_name not in active:
+                continue
+
             logging.debug("Loading plugin {}".format(mod_name))
 
+            hooks[mod_name] = {}
+
+            # Locate all methods that begin with 'on_'
             for hook in re.findall("on_(\w+)", " ".join(dir(mod))):
                 fhook_name = "on_{}".format(hook)
                 fhook = getattr(mod, fhook_name)
 
+                hooks[mod_name][fhook_name] = fhook
                 logging.debug("Attached {} hook for {}".format(fhook_name, 
                     mod_name))
-                hooks.setdefault(hook, []).append(fhook)
+
+            if mod.__doc__:
+                hooks[mod_name]['help'] = mod.__doc__
 
         except Exception as e:
             print(e)

@@ -8,7 +8,7 @@ class SlackBot(SlackClient):
     def __init__(self, name, token, plugins):
         SlackClient.__init__(self, name, token)
         self.plugins = plugins
-        self.ws = None
+        self.rtm_connect()
 
 
     def rtm_connect(self):
@@ -20,21 +20,32 @@ class SlackBot(SlackClient):
             on_close=self.on_close)
 
 
+    def send_text(self, channel, text):
+        payload = {
+            'id': 1, 
+            'type': 'message', 
+            'channel': channel, 
+            'text': text, 
+        }
+        self.ws.send(json.dumps(payload))
+
+
     def on_open(self, ws):
-        pass
+        logging.info("Opened connection to Slack for {}".format(self.name))
 
 
     def on_message(self, ws, message):
+        """Method that is called whenever a message is received by the 
+        active websocket.
+        """
         parsed = json.loads(message)
 
-        if parsed['type'] == 'message' and parsed['channel'] == 'C040YN0L6':
-            payload = {
-                "id": 1,
-                "type": "message",
-                "channel": parsed['channel'],
-                "text": "pong!"
-            }
-            self.ws.send(json.dumps(payload))
+        if parsed['type'] == 'message':
+            for plugin, hooks in self.plugins.items():
+                response = hooks['on_message'](parsed)
+
+                if response:
+                    self.send_text(parsed['channel'], response)
 
 
     def on_error(self, ws, error):
@@ -48,6 +59,10 @@ class SlackBot(SlackClient):
     def run(self):
         if not self.ws:
             self.rtm_connect()
-        self.ws.run_forever()
+        
+        try:
+            self.ws.run_forever()
+        except KeyboardInterrupt as e:
+            raise
 
 

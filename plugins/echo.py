@@ -4,11 +4,11 @@ Sample usage:
 !echo [TEXT]
 """
 
-def register():
-	return '!echo'
+def match(message):
+    return '!echo'
 
 
 def on_message(message, server):
-	return message
+    return message
 
 
