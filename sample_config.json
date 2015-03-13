@@ -1,0 +1,5 @@
+{
+    "name": "slackbot", 
+    "token": "my-secret-key", 
+    "plugins": ["help", "echo"]
+}

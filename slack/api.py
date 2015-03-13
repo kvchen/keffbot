@@ -8,7 +8,8 @@ class SlackEndpoints(object):
         """Returns the URL corresponding the API endpoint specified by the
         arguments.
         """
-        return urllib.parse.urljoin(self.base, *args)
+        endpoint = '.'.join(args)
+        return urllib.parse.urljoin(self.base, endpoint)
 
 
 endpoints = SlackEndpoints()
