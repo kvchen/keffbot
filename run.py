@@ -33,7 +33,6 @@ def load_plugins(active_plugins):
     if not os.path.isdir(PLUGIN_DIR):
         logging.exception(OSError)
 
-    active = set(active_plugins)
     old_path = copy.deepcopy(sys.path)
     sys.path.insert(0, PLUGIN_DIR)
 
@@ -44,7 +43,7 @@ def load_plugins(active_plugins):
             mod = importlib.import_module(os.path.basename(plugin)[:-3])
             mod_name = mod.__name__
 
-            if mod_name not in active:
+            if mod_name not in active_plugins:
                 continue
 
             logging.debug("Loading plugin {}".format(mod_name))

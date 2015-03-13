@@ -1,8 +1,12 @@
 import json
 import logging
+import time
 import websocket
 
 from .client import SlackClient
+
+
+RATE_LIMIT = 1
 
 class SlackBot(SlackClient):
     def __init__(self, name, token, plugins):
@@ -40,12 +44,20 @@ class SlackBot(SlackClient):
         """
         parsed = json.loads(message)
 
-        if parsed['type'] == 'message':
-            for plugin, hooks in self.plugins.items():
-                response = hooks['on_message'](parsed)
+        # Confirmation of a sent message
+        if 'reply_to' in parsed:
+            pass
 
-                if response:
-                    self.send_text(parsed['channel'], response)
+        # Handle normal user events
+        elif 'type' in parsed:
+            if parsed['type'] == 'message':
+                for plugin, hooks in self.plugins.items():
+                    response = hooks['on_message'](parsed)
+
+                    if response:
+                        self.send_text(parsed['channel'], response)
+                        time.sleep(RATE_LIMIT)
+                        break
 
 
     def on_error(self, ws, error):
