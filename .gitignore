@@ -2,7 +2,7 @@
 .DS_Store
 
 # Configuration
-config.*
+auth.*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

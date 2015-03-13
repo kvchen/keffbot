@@ -15,15 +15,16 @@ from slack import SlackBot
 logging.basicConfig(level=logging.INFO)
 
 
+AUTH_FILE = 'auth.json'
 CONFIG_FILE = 'config.json'
 
 CURRENT_DIR = os.path.abspath(os.path.dirname(__file__))
 PLUGIN_DIR = os.path.join(CURRENT_DIR, 'plugins')
 
 
-def read_config():
-    """Loads the bot configuration from a JSON file as a dictionary."""
-    with open(CONFIG_FILE, 'r') as infile:
+def read_config(filename):
+    """Loads a JSON file as a dictionary."""
+    with open(filename, 'r') as infile:
         return json.load(infile)
 
 
@@ -81,10 +82,12 @@ def main():
     if args.debug:
         logging.basicConfig(level=logging.DEBUG)
 
-    config = read_config()
+    auth = read_config(AUTH_FILE)
+    config = read_config(CONFIG_FILE)
+
     plugins = load_plugins(config['active_plugins'])
 
-    keffbot = SlackBot(config['name'], config['token'], plugins)
+    keffbot = SlackBot(auth['name'], auth['token'], plugins)
     keffbot.run()
 
 
