@@ -1,11 +1,20 @@
 {
-    "active_plugins": {
-        "ping": {}, 
-        "help": {},
-        "bobarocket": {
+    "admin": "keff", 
+    "plugin_dir": "plugins/", 
+    "plugin_info": {
+        "help": {
+            "enabled": true, 
+            "restricted": false
+        }, 
+        "ping": {
+            "enabled": true, 
+            "restricted": false
+        }, 
+        "admin": {
+            "enabled": true, 
+            "restricted": true, 
             "whitelist": {
-                "team": null, 
-                "channels": []
+                "hab": ["bot-testing"]
             }
         }
     }

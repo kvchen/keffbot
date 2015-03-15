@@ -37,12 +37,12 @@ class SlackClient(object):
 
         self.ws = websocket.WebSocketApp(handshake['url'], 
             on_open=self.on_open, 
-            on_message=self.on_message, 
+            on_message=self.on_event, 
             on_error=self.on_error,
             on_close=self.on_close)
 
 
-    def on_message(self, ws, message):
+    def on_event(self, ws, message):
         pass
 
 

@@ -9,7 +9,7 @@ __match__ = r'(?i){}'.format('|'.join(phrases))
 
 
 def on_message(bot, message):
-    msg_lower = message['text'].lower()
+    msg_lower = message.lower()
     if msg_lower in phrases:
         return phrases[msg_lower]
 
