@@ -1,7 +1,12 @@
 {
     "active_plugins": {
-        "pingpong": {
-            
+        "pingpong": {}, 
+        "help": {},
+        "bobarocket": {
+            "whitelist": {
+                "team": null, 
+                "channels": []
+            }
         }
     }
 }

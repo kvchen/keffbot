@@ -12,14 +12,19 @@ import sys
 
 from slack import SlackBot
 
-logging.basicConfig(level=logging.INFO)
-
 
 AUTH_FILE = 'auth.json'
 CONFIG_FILE = 'config.json'
 
 CURRENT_DIR = os.path.abspath(os.path.dirname(__file__))
 PLUGIN_DIR = os.path.join(CURRENT_DIR, 'plugins')
+
+
+FORMAT = '%(asctime)s - %(levelname)s - %(module)s - %(message)s'
+logging.basicConfig(format=FORMAT)
+
+logger = logging.getLogger('root')
+logger.setLevel(logging.INFO)
 
 
 def read_config(filename):
@@ -31,44 +36,53 @@ def read_config(filename):
 def load_plugins(active_plugins):
     """Loads plugins from the PLUGIN_DIR."""
     if not os.path.isdir(PLUGIN_DIR):
-        logging.exception(OSError)
+        logger.exception(OSError)
 
     old_path = copy.deepcopy(sys.path)
     sys.path.insert(0, PLUGIN_DIR)
 
-    hooks = {}
+    plugins = {}
 
-    for plugin in glob(os.path.join(PLUGIN_DIR, "[!_]*.py")):
+    for plugin_file in glob(os.path.join(PLUGIN_DIR, "[!_]*.py")):
         try:
-            mod = importlib.import_module(os.path.basename(plugin)[:-3])
+            mod = importlib.import_module(os.path.basename(plugin_file)[:-3])
             mod_name = mod.__name__
 
+            # Skip the plugin if not active
             if mod_name not in active_plugins:
+                logger.debug("Skipping inactive plugin {}".format(mod_name))
                 continue
+            else:
+                logger.debug("Loading plugin {}".format(mod_name))
+                plugins[mod_name] = {}
 
-            logging.debug("Loading plugin {}".format(mod_name))
+            # Check if the plugin has a regular expression for matching
+            if '__match__' in dir(mod):
+                p_match = mod.__match__
+            else:
+                p_match = r'!{0} (.*)'.format(mod_name)
+            plugins[mod_name]['match'] = re.compile(p_match)
 
-            hooks[mod_name] = {}
+            # Add the docstring to help if it exists
+            if mod.__doc__:
+                plugins[mod_name]['help'] = mod.__doc__
 
             # Locate all methods that begin with 'on_'
-            for hook in re.findall("on_(\w+)", " ".join(dir(mod))):
-                fhook_name = "on_{}".format(hook)
-                fhook = getattr(mod, fhook_name)
+            for hook in re.findall('on_(\w+)', ' '.join(dir(mod))):
+                hook_name = 'on_{}'.format(hook)
+                hook_fn = getattr(mod, hook_name)
 
-                hooks[mod_name][fhook_name] = fhook
-                logging.debug("Attached {} hook for {}".format(fhook_name, 
+                plugins[mod_name][hook_name] = hook_fn
+                logger.debug("Attached {} hook for {}".format(hook_name, 
                     mod_name))
 
-            if mod.__doc__:
-                hooks[mod_name]['help'] = mod.__doc__
-
         except Exception as e:
-            print(e)
-            logging.warn("Import failed for {}, plugin not loaded".format(
-                plugin))
+            logger.exception(e)
+            logger.warn("Import failed for {}, plugin not loaded".format(
+                mod))
 
     sys.path = old_path
-    return hooks
+    return plugins
 
 
 def main():
@@ -79,14 +93,15 @@ def main():
     args = parser.parse_args()
 
     if args.debug:
-        logging.basicConfig(level=logging.DEBUG)
+        logger.info("Debugging output enabled")
+        logger.setLevel(logging.DEBUG)
 
     auth = read_config(AUTH_FILE)
     config = read_config(CONFIG_FILE)
 
     plugins = load_plugins(config['active_plugins'])
 
-    keffbot = SlackBot(auth['name'], auth['token'], plugins)
+    keffbot = SlackBot(auth['token'], plugins)
     keffbot.run()
 
 
