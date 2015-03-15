@@ -8,7 +8,7 @@ phrases = {
 __match__ = r'(?i){}'.format('|'.join(phrases))
 
 
-def on_message(bot, message):
+def on_message(bot, channel, user, message):
     msg_lower = message.lower()
     if msg_lower in phrases:
         return phrases[msg_lower]

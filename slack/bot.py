@@ -62,16 +62,18 @@ class SlackBot(SlackClient):
 
 
     def on_message(self, event):
+        channel_id = event['channel']
         user_id = event['user']
         is_admin = user_id == self.admin_id
 
         for plugin_name, info in self.plugins.items():
-            message_text = event['text']
-            if info['match'].match(message_text):
+            message = event['text']
+            if info['match'].match(message):
                 logger.debug('Message matched by {}'.format(plugin_name))
 
                 if not info['restricted'] or is_admin:
-                    response = info['module'].on_message(self, message_text)
+                    response = info['module'].on_message(self, channel_id, 
+                        user_id, message)
 
                     if response:
                         self.send_text(event['channel'], response)
@@ -119,16 +121,8 @@ class SlackBot(SlackClient):
                 if mod.__doc__:
                     self.plugins[mod_name]['help'] = mod.__doc__
 
-                # Locate all methods that begin with 'on_'
+                # Store the module and its commands
                 self.plugins[mod_name]['module'] = mod
-
-                # for hook in re.findall('on_(\w+)', ' '.join(dir(mod))):
-                #     hook_name = 'on_{}'.format(hook)
-                #     hook_fn = getattr(mod, hook_name)
-
-                #     plugins[mod_name][hook_name] = hook_fn
-                #     logger.debug("Attached '{}' hook for {}".format(hook_name, 
-                #         mod_name))
 
             except Exception as e:
                 logger.exception(e)

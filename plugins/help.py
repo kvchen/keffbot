@@ -5,7 +5,7 @@ import re
 __match__ = r"!help( .*)?"
 
 
-def on_message(bot, message):
+def on_message(bot, channel, user, message):
     command = re.findall(__match__, message)[0].strip()
     
     if command:
