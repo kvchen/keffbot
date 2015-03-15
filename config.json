@@ -1,6 +1,6 @@
 {
     "active_plugins": {
-        "pingpong": {}, 
+        "ping": {}, 
         "help": {},
         "bobarocket": {
             "whitelist": {

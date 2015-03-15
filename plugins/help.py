@@ -1,9 +1,4 @@
-"""Prints help on a command provided by the bot, or all the commands if none
-specifically requested.
-
-Sample usage:
-!help [COMMAND]
-"""
+"""!help [command]: Prints documentation on a command provided by the bot."""
 
 import re
 
