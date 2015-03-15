@@ -14,7 +14,7 @@
             "enabled": true, 
             "restricted": true, 
             "whitelist": {
-                "hab": ["bot-testing"]
+                "H@B": ["bot-testing"]
             }
         }
     }

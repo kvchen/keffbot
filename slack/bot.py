@@ -72,7 +72,7 @@ class SlackBot(SlackClient):
                 logger.debug('Message matched by {}'.format(plugin_name))
 
                 channel_info = self.call_api('channels', 'info', 
-                    channel=channel_id)
+                    channel=channel_id)['channel']
 
                 # Check black/whitelisting filters
                 if 'whitelist' in info:
