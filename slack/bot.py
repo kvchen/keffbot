@@ -71,6 +71,31 @@ class SlackBot(SlackClient):
             if info['match'].match(message):
                 logger.debug('Message matched by {}'.format(plugin_name))
 
+                channel_info = self.call_api('channels', 'info', 
+                    channel=channel_id)
+
+                # Check black/whitelisting filters
+                if 'whitelist' in info:
+                    if self.team.name not in info['whitelist']:
+                        logger.debug("Team not whitelisted for command '{}'"
+                            .format(plugin_name))
+                        break
+
+                    whitelisted = info['whitelist'][self.team.name]
+                    if channel_info['name'] not in whitelisted:
+                        logger.debug("Channel not whitelisted for command '{}'"
+                            .format(plugin_name))
+                        break
+
+                if 'blacklist' in info:
+                    if self.team.name in info['blacklist']:
+                        blacklisted = info['blacklist'][self.team.name]
+                        if channel_info['name'] in blacklisted:
+                            logger.debug("Channel blacklisted for command '{}'"
+                                .format(plugin_name))
+                            break
+
+                # Allow only admins to call restricted commands
                 if not info['restricted'] or is_admin:
                     response = info['module'].on_message(self, channel_id, 
                         user_id, message)
@@ -104,11 +129,17 @@ class SlackBot(SlackClient):
                 elif not self.plugin_info[mod_name]['enabled']:
                     logger.debug("Skipping inactive plugin {}".format(mod_name))
                     continue
-                else:
-                    logger.debug("Loading plugin {}".format(mod_name))
-                    self.plugins[mod_name] = {
-                        'restricted': self.plugin_info[mod_name]['restricted']
-                    }
+
+                logger.debug("Loading plugin {}".format(mod_name))
+                self.plugins[mod_name] = {
+                    'restricted': self.plugin_info[mod_name]['restricted']
+                }
+
+                # Add in filters
+                for lst in ('whitelist', 'blacklist'):
+                    if lst in self.plugin_info[mod_name]:
+                        lst_filter = self.plugin_info[mod_name][lst]
+                        self.plugins[mod_name][lst] = lst_filter
 
                 # Check if the plugin has a regular expression for matching
                 if '__match__' in dir(mod):
