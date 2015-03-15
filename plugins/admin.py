@@ -14,11 +14,11 @@ def on_message(bot, channel, user, message):
     if message == '!update':
         local = git.Repo(os.getcwd())
         origin = git.remote.Remote(local, 'origin')
-        head = local.heads[0]
+        prev_commit = local.heads[0].commit
 
         logger.info("Updating from origin repository")
         for pull_info in origin.pull():
-            if head.commit == pull_info.commit:
+            if prev_commit == pull_info.commit:
                 bot.send_text(channel, "`{}` is already up-to-date!".format(
                     bot.name))
                 break
