@@ -2,6 +2,10 @@
     "admin": "keff", 
     "plugin_dir": "plugins/", 
     "plugin_info": {
+        "cowsay": {
+            "enabled": true, 
+            "restricted": false
+        }, 
         "help": {
             "enabled": true, 
             "restricted": false
