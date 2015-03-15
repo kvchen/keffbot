@@ -1,4 +1,4 @@
-"""!event <text>: Displays a cow speaking the input text."""
+"""!cowsay <text>: Displays a speaking cow that echos the input text."""
 
 # A python implementation of cowsay <http://www.nog.net/~tony/warez/cowsay.shtml>
 # Copyright 2011 Jesse Chan-Norris <jcn@pith.org>
