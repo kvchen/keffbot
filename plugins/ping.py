@@ -3,6 +3,7 @@
 phrases = {
     'ping': 'pong!', 
     'ayyy': ':fu:', 
+    'he\'s losing his mind': 'and I\'m reaping all the benefits', 
 }
 
 __match__ = r'(?i){}'.format('|'.join(phrases))
