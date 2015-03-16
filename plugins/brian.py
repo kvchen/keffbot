@@ -5,31 +5,42 @@ import random
 
 __match__ = r"!brian"
 
+attribution = [
+    "salad master", 
+    "esquire", 
+    "the one and only", 
+    "startup enthusiast", 
+    "boba king", 
+    "not-dictator", 
+    "normal citizen", 
+    "ping-pong expert"
+]
 
-with open('plugins/brian_corpus/cache.json', 'r') as infile:
-    cache = json.load(infile)
 
 with open('plugins/brian_corpus/phrases.json', 'r') as infile:
     phrases = json.load(infile)
 
+with open('plugins/brian_corpus/cache.json', 'r') as infile:
+    cache = json.load(infile)
 
-def generate_phrase(phrases, cache):
+
+def generate_phrase(phrases, cache, max_length=40):
     seed_phrase = []
-    while len(seed_phrase) < 3:
+    while len(seed_phrase) < 2:
         seed_phrase = random.choice(phrases).split()
 
-    w1, w2 = seed_phrase[:2]
-    chosen = [w1, w2]
+    w1, = seed_phrase[:1]
+    chosen = [w1]
 
-    while "{}|{}".format(w1, w2) in cache:
-        choice = random.choice(cache["{}|{}".format(w1, w2)])
-        w1, w2 = w2, choice
-        chosen.append(choice)
+    while w1 in cache and len(chosen)<max_length:
+        w1 = random.choice(cache[w1])
+        chosen.append(w1)
 
     return ' '.join(chosen)
 
 
 def on_message(bot, channel, user, message):
-    return '> {} ~brian'.format(generate_phrase(phrases, cache))
+    return '> {} ~ Brian Chu, {}'.format(generate_phrase(phrases, cache), 
+        random.choice(attribution))
 
 
