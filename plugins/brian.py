@@ -30,6 +30,6 @@ def generate_phrase(phrases, cache):
 
 
 def on_message(bot, channel, user, message):
-    return generate_phrase(phrases, cache)
+    return '> {}'.format(generate_phrase(phrases, cache))
 
 
