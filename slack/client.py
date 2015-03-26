@@ -6,6 +6,8 @@ from .api import endpoints
 from .exception import SlackError
 from .team import SlackTeam
 
+logger = logging.getLogger('root')
+
 class SlackClient(object):
     def __init__(self, token):
         self.token = token
@@ -17,8 +19,8 @@ class SlackClient(object):
 
         res = requests.get(endpoint, params=params).json()
         if not res['ok']:
-            raise SlackError('API call to {}.{} failed'.format(category, 
-                method))
+            logger.error('API call to {}.{} failed: {}'.format(category, 
+                method, res['error']))
 
         return res
 

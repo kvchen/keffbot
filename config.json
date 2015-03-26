@@ -2,19 +2,15 @@
     "admin": "keff", 
     "plugin_dir": "plugins/", 
     "plugin_info": {
-        "brian": {
-            "enabled": true, 
-            "restricted": false
-        }, 
-        "cowsay": {
-            "enabled": true, 
-            "restricted": false
-        }, 
         "help": {
             "enabled": true, 
             "restricted": false
         }, 
         "ping": {
+            "enabled": true, 
+            "restricted": false
+        }, 
+        "gbp": {
             "enabled": true, 
             "restricted": false
         }, 

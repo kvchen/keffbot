@@ -1,4 +1,4 @@
-"""Displays a randomly generated witticism from Brian Chu himself."""
+"""!brian: Displays a randomly generated witticism from Brian Chu himself."""
 
 import json
 import random
